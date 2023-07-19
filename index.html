@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Transcripción de YouTube</title>
+</head>
+<body>
+  <div id="videoTranscript"></div>
+
+  <script>
+    // ID del video de YouTube
+    const videoId = 'https://www.youtube.com/watch?v=Au8JPAkzLFQ&list=PLAlru-49QVUCDCPzF52MJRZdYlQPKSPBP';
+
+    // URL para obtener la transcripción de YouTube
+    const apiUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}`;
+
+    // Realizar la solicitud a la API pública de YouTube
+    fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        if (data.items.length > 0) {
+          const captions = data.items[0].snippet.captions;
+          if (captions && captions.length > 0) {
+            const captionUrl = `https://www.youtube.com/api/timedtext?lang=${captions[0]}&v=${videoId}`;
+            fetch(captionUrl)
+              .then(response => response.text())
+              .then(text => {
+                // Mostrar la transcripción en el div "videoTranscript"
+                document.getElementById('videoTranscript').innerText = text;
+              });
+          } else {
+            document.getElementById('videoTranscript').innerText = 'No se encontraron subtítulos para este video.';
+          }
+        } else {
+          document.getElementById('videoTranscript').innerText = 'No se encontró información para este video.';
+        }
+      })
+      .catch(error => {
+        console.error('Error al obtener la transcripción:', error);
+        document.getElementById('videoTranscript').innerText = 'Error al obtener la transcripción.';
+      });
+  </script>
+</body>
+</html>
